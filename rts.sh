@@ -10,7 +10,7 @@ hong='\033[31m'
 kjlan='\033[96m'
 hui='\e[37m'
 
-cp ./rts.sh /usr/local/bin/k > /dev/null 2>&1
+cp ./rts.sh /usr/local/bin/v > /dev/null 2>&1
 
 
 ip_address() {
