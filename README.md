@@ -1,5 +1,5 @@
 
 ## VPS一键脚本
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/rts600/sing-box/main/sing-box.sh)
+curl -sS -O https://raw.githubusercontent.com/rts600/vps/main/rts.sh && chmod +x rts.sh && ./rts.sh
 ```
