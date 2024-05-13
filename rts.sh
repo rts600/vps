@@ -47,6 +47,7 @@ install() {
 uninstall() {
     rm -rf rts.sh
     rm -rf /usr/local/bin/v
+    rm -rf Internet_Limit.sh
 }
 
 remove() {
