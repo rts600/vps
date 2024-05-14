@@ -1536,7 +1536,7 @@ case $choice in
                 echo "如果实际服务器就100G流量，可设置阈值为95G，提前关机，以免出现流量误差或溢出."
                 read -p "请输入流量阈值（单位为GB）: " threshold_gb
                 cd ~
-                curl -Ss -O https://raw.githubusercontent.com/rts600/sh/main/Internet_Limit.sh
+                curl -Ss -O https://raw.githubusercontent.com/rts600/vps/main/Internet_Limit.sh
                 chmod +x ~/Internet_Limit.sh
                 sed -i "s/110/$threshold_gb/g" ~/Internet_Limit.sh
                 crontab -l | grep -v '~/Internet_Limit.sh' | crontab -
