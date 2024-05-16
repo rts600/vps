@@ -1335,8 +1335,8 @@ case $choice in
       echo "2. 开放IPV4端口"
       echo "3. ROOT密码登录"
       echo "4. 限流自动关机"
-      echo "5. 一键重装系统"
-      echo "6. DD重装系统"
+      echo "5. DD重装系统"      
+      echo "6. 一键重装系统"
       echo "7. 修改主机名"     
       echo "8. 用户管理"            
       echo "9. 定时任务管理"      
@@ -1554,7 +1554,7 @@ case $choice in
                   esac
               done
               ;;
-          6)
+          5)
           clear
           echo "请备份数据，将为你重装系统，预计花费15分钟。"
           read -p "确定继续吗？(Y/N): " choice
@@ -1592,7 +1592,7 @@ case $choice in
           esac
               ;;
 
-          7)
+          6)
           dd_xitong_2() {
             echo -e "任意键继续，重装后初始用户名: ${huang}root${bai}  初始密码: ${huang}LeitboGi0ro${bai}  初始端口: ${huang}22${bai}"
             read -n 1 -s -r -p ""
