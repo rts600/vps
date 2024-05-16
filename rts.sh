@@ -183,6 +183,15 @@ linux_clean() {
 
 }
 
+bbr_on() {
+
+cat > /etc/sysctl.conf << EOF
+net.core.default_qdisc=fq_pie
+net.ipv4.tcp_congestion_control=bbr
+EOF
+sysctl -p
+
+}
 
 install_add_docker() {
     if [ -f "/etc/alpine-release" ]; then
@@ -1844,17 +1853,11 @@ case $choice in
       echo -e "[${lv}OK${bai}] 4/5. 开放所有IPV4端口"
 
       echo "------------------------------------------------"
-      cat > /etc/sysctl.conf << 'EOF'
-      net.core.default_qdisc=fq_pie
-      net.ipv4.tcp_congestion_control=bbr
-      EOF
-      sysctl -p
-      ;;
+      bbr_on
       echo -e "[${lv}OK${bai}] 5/5. 开启${huang}BBR${bai}加速"
 
       echo "------------------------------------------------"
       echo -e "${lv}系统设置与调整已完成${bai}"
-
        ;;
       [Nn])
       echo "已取消"
