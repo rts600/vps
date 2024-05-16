@@ -1844,7 +1844,7 @@ case $choice in
       echo -e "[${lv}OK${bai}] 4/5. 开放所有IPV4端口"
 
       echo "------------------------------------------------"
-      cat > /etc/sysctl.conf << EOF
+      cat > /etc/sysctl.conf << 'EOF'
       net.core.default_qdisc=fq_pie
       net.ipv4.tcp_congestion_control=bbr
       EOF
