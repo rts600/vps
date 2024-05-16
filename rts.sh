@@ -1301,8 +1301,9 @@ case $choice in
               passwd
               sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config;
               sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config;
-              service sshd restart
-              echo "ROOT登录设置完毕！"
+              rm -rf /etc/ssh/sshd_config.d/* /etc/ssh/ssh_config.d/*
+              restart_ssh
+              echo -e "${lv}ROOT登录设置完毕！${bai}"
               server_reboot
               ;;
           e)
