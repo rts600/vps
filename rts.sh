@@ -136,6 +136,54 @@ fi
 }
 
 
+linux_update() {
+
+    # Update system on Debian-based systems
+    if [ -f "/etc/debian_version" ]; then
+        apt update -y && DEBIAN_FRONTEND=noninteractive apt full-upgrade -y
+    fi
+
+    # Update system on Red Hat-based systems
+    if [ -f "/etc/redhat-release" ]; then
+        yum -y update
+    fi
+
+}
+
+
+linux_clean() {
+    clean_debian() {
+        apt autoremove --purge -y
+        apt clean -y
+        apt autoclean -y
+        apt remove --purge $(dpkg -l | awk '/^rc/ {print $2}') -y
+        journalctl --rotate
+        journalctl --vacuum-time=1s
+        journalctl --vacuum-size=50M
+        apt remove --purge $(dpkg -l | awk '/^ii linux-(image|headers)-[^ ]+/{print $2}' | grep -v $(uname -r | sed 's/-.*//') | xargs) -y
+    }
+
+    clean_redhat() {
+        yum autoremove -y
+        yum clean all
+        journalctl --rotate
+        journalctl --vacuum-time=1s
+        journalctl --vacuum-size=50M
+        yum remove $(rpm -q kernel | grep -v $(uname -r)) -y
+    }
+
+    # Main script
+    if [ -f "/etc/debian_version" ]; then
+        # Debian-based systems
+        clean_debian
+    elif [ -f "/etc/redhat-release" ]; then
+        # Red Hat-based systems
+        clean_redhat
+    fi
+
+}
+
+
 install_add_docker() {
     if [ -f "/etc/alpine-release" ]; then
         apk update
@@ -401,6 +449,7 @@ echo -e "${kjlan}_  _ ____  _ _ _    _ ____ _  _ "
 echo -e "${kjlan}$sh_v[支持Ubuntu/Debian系统]${bai}"
 echo -e "${kjlan}-输入${hong}v${kjlan}快速启动定制脚本-${bai}"
 echo "------------------------"
+echo "a. 新机设置 ▶"
 echo "1. 系统信息"
 echo "2. 系统更新"
 echo "3. 系统清理"
@@ -408,8 +457,7 @@ echo "4. 测试工具 ▶"
 echo "5. 常用工具 ▶"
 echo "6. 系统工具 ▶"
 echo "7. 面板工具 ▶"
-echo "8. 甲骨文工具 ▶"
-echo "9. Docker管理 ▶"
+echo "8. Docker管理 ▶"
 echo "------------------------"
 echo "e. 退出脚本"
 echo "i. 卸载脚本"
@@ -525,66 +573,11 @@ case $choice in
 
   2)
     clear
-
-    # Update system on Debian-based systems
-    if [ -f "/etc/debian_version" ]; then
-        apt update -y && DEBIAN_FRONTEND=noninteractive apt full-upgrade -y
-    fi
-
-    # Update system on Red Hat-based systems
-    if [ -f "/etc/redhat-release" ]; then
-        yum -y update
-    fi
-
-    # Update system on Alpine Linux
-    if [ -f "/etc/alpine-release" ]; then
-        apk update && apk upgrade
-    fi
-
+    linux_update
     ;;
 
   3)
     clear
-    clean_debian() {
-        apt autoremove --purge -y
-        apt clean -y
-        apt autoclean -y
-        apt remove --purge $(dpkg -l | awk '/^rc/ {print $2}') -y
-        journalctl --rotate
-        journalctl --vacuum-time=1s
-        journalctl --vacuum-size=50M
-        apt remove --purge $(dpkg -l | awk '/^ii linux-(image|headers)-[^ ]+/{print $2}' | grep -v $(uname -r | sed 's/-.*//') | xargs) -y
-    }
-
-    clean_redhat() {
-        yum autoremove -y
-        yum clean all
-        journalctl --rotate
-        journalctl --vacuum-time=1s
-        journalctl --vacuum-size=50M
-        yum remove $(rpm -q kernel | grep -v $(uname -r)) -y
-    }
-
-    clean_alpine() {
-        apk del --purge $(apk info --installed | awk '{print $1}' | grep -v $(apk info --available | awk '{print $1}'))
-        apk autoremove
-        apk cache clean
-        rm -rf /var/log/*
-        rm -rf /var/cache/apk/*
-    }
-
-    # Main script
-    if [ -f "/etc/debian_version" ]; then
-        # Debian-based systems
-        clean_debian
-    elif [ -f "/etc/redhat-release" ]; then
-        # Red Hat-based systems
-        clean_redhat
-    elif [ -f "/etc/alpine-release" ]; then
-        # Alpine Linux
-        clean_alpine
-    fi
-
     ;;
 
   4)
@@ -880,7 +873,7 @@ case $choice in
 
     ;;
 
-  9)
+  8)
     while true; do
       clear
       echo "▶ Docker管理器"
@@ -1230,112 +1223,6 @@ case $choice in
     done
     ;;
 
-  8)
-     while true; do
-      clear
-      echo "▶ 甲骨文工具"
-      echo "------------------------"
-      echo "1. 安装活跃脚本"
-      echo "2. 卸载活跃脚本"
-      echo "------------------------"
-      echo "3. DD重装系统"
-      echo "------------------------"
-      echo "4. 开启ROOT密码登录"
-      echo "------------------------"
-      echo "e. 返回主菜单"
-      echo "------------------------"
-      read -p "请输入你的选择: " sub_choice
-
-      case $sub_choice in
-          1)
-              clear
-              echo "活跃脚本: CPU占用10-20% 内存占用15% "
-              read -p "确定安装吗？(Y/N): " choice
-              case "$choice" in
-                [Yy])
-
-                  install_docker
-
-                  docker run -itd --name=lookbusy --restart=always \
-                          -e TZ=Asia/Shanghai \
-                          -e CPU_UTIL=10-20 \
-                          -e CPU_CORE=1 \
-                          -e MEM_UTIL=15 \
-                          -e SPEEDTEST_INTERVAL=120 \
-                          fogforest/lookbusy
-                  ;;
-                [Nn])
-                  ;;
-                *)
-                  echo "无效的选择，请输入 Y 或 N。"
-                  ;;
-              esac
-              ;;
-          2)
-              clear
-              docker rm -f lookbusy
-              docker rmi fogforest/lookbusy
-              ;;
-          3)
-          clear
-          echo "请备份数据，将为你重装系统，预计花费15分钟。"
-          read -p "确定继续吗？(Y/N): " choice
-
-          case "$choice" in
-            [Yy])
-              while true; do
-                read -p "请选择要重装的系统:  1. Debian12 | 2. Ubuntu20.04 : " sys_choice
-
-                case "$sys_choice" in
-                  1)
-                    xitong="-d 12"
-                    break  # 结束循环
-                    ;;
-                  2)
-                    xitong="-u 20.04"
-                    break  # 结束循环
-                    ;;
-                  *)
-                    echo "无效的选择，请重新输入。"
-                    ;;
-                esac
-              done
-
-              read -p "请输入你重装后的密码: " vpspasswd
-              install wget
-              bash <(wget --no-check-certificate -qO- 'https://raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh') $xitong -v 64 -p $vpspasswd -port 22
-              ;;
-            [Nn])
-              echo "已取消"
-              ;;
-            *)
-              echo "无效的选择，请输入 Y 或 N。"
-              ;;
-          esac
-              ;;
-          4)
-              clear
-              echo "设置你的ROOT密码"
-              passwd
-              sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config;
-              sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config;
-              rm -rf /etc/ssh/sshd_config.d/* /etc/ssh/ssh_config.d/*
-              restart_ssh
-              echo -e "${lv}ROOT登录设置完毕！${bai}"
-              server_reboot
-              ;;
-          e)
-              rts
-              ;;
-          *)
-              echo "无效的输入!"
-              ;;
-      esac
-      break_end
-
-    done
-    ;;
-
   7)
     while true; do
       clear
@@ -1435,15 +1322,18 @@ case $choice in
       clear
       echo "▶ 系统工具"
       echo "------------------------"
-      echo "1. 更改脚本启动快捷键"
-      echo "2. 查看端口占用状态"      
-      echo "3. 开放IPV4端口"
-      echo "4. 系统时区调整"
-      echo "5. 限流自动关机"      
-      echo "6. 用户管理"            
-      echo "7. 一键重装系统"
-      echo "8. 修改主机名"
-      echo "9. 定时任务管理"
+      echo "1. 系统时区调整"
+      echo "2. 开放IPV4端口"
+      echo "3. ROOT密码登录"
+      echo "4. 限流自动关机"
+      echo "5. 一键重装系统"
+      echo "6. DD重装系统"
+      echo "7. 修改主机名"     
+      echo "8. 用户管理"            
+      echo "9. 定时任务管理"      
+      echo "a. 更改脚本快捷键"
+      echo "b. 查看端口状态"
+      echo "c. 甲骨文工具"      
       echo "------------------------"      
       echo "r. 重启服务器"
       echo "------------------------"
@@ -1452,23 +1342,23 @@ case $choice in
       read -p "请输入你的选择: " sub_choice
 
       case $sub_choice in
-          1)
+          a)
               clear
               read -p "请输入你的快捷按键: " kuaijiejian
               echo "alias $kuaijiejian='~/rts.sh'" >> ~/.bashrc
               source ~/.bashrc
               echo "快捷键已设置"
               ;;             
-          2)
+          b)
             clear
             ss -tulnape
             ;;
-          3)
+          2)
               clear
               iptables_open
               echo "IPV4端口已开放"
               ;;
-          4)
+          1)
             while true; do
                 clear
                 echo "系统时间信息"
@@ -1493,9 +1383,9 @@ case $choice in
                 echo "欧洲------------------------"
                 echo "11. 英国伦敦时间             12. 法国巴黎时间"
                 echo "13. 德国柏林时间             14. 俄罗斯莫斯科时间"
-                echo "15. 荷兰尤特赖赫特时间       16. 西班牙马德里时间"
+                echo "15. 荷兰尤特赖赫特时间        16. 西班牙马德里时间"
                 echo "美洲------------------------"
-                echo "21. 美国西部时间             22. 美国东部时间"
+                echo "21. 美国西部时间              22. 美国东部时间"
                 echo "23. 加拿大时间               24. 墨西哥时间"
                 echo "25. 巴西时间                 26. 阿根廷时间"
                 echo "------------------------"
@@ -1529,7 +1419,7 @@ case $choice in
                 esac
             done
               ;;
-          5)
+          4)
             clear
             echo "当前流量使用情况，重启服务器流量计算会清零！"
             output_status
@@ -1579,7 +1469,7 @@ case $choice in
             esac
               ;;
 
-          6)
+          8)
               while true; do
                 clear
                 install sudo
@@ -1655,6 +1545,43 @@ case $choice in
                   esac
               done
               ;;
+          6)
+          clear
+          echo "请备份数据，将为你重装系统，预计花费15分钟。"
+          read -p "确定继续吗？(Y/N): " choice
+
+          case "$choice" in
+            [Yy])
+              while true; do
+                read -p "请选择要重装的系统:  1. Debian12 | 2. Ubuntu20.04 : " sys_choice
+
+                case "$sys_choice" in
+                  1)
+                    xitong="-d 12"
+                    break  # 结束循环
+                    ;;
+                  2)
+                    xitong="-u 20.04"
+                    break  # 结束循环
+                    ;;
+                  *)
+                    echo "无效的选择，请重新输入。"
+                    ;;
+                esac
+              done
+
+              read -p "请输入你重装后的密码: " vpspasswd
+              install wget
+              bash <(wget --no-check-certificate -qO- 'https://raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh') $xitong -v 64 -p $vpspasswd -port 22
+              ;;
+            [Nn])
+              echo "已取消"
+              ;;
+            *)
+              echo "无效的选择，请输入 Y 或 N。"
+              ;;
+          esac
+              ;;
 
           7)
           dd_xitong_2() {
@@ -1721,7 +1648,7 @@ case $choice in
           esac
               ;;
 
-          8)
+          7)
           clear
           current_hostname=$(hostname)
           echo "当前主机名: $current_hostname"
@@ -1800,6 +1727,73 @@ case $choice in
               done
               ;;
 
+          3)
+              clear
+              echo "设置你的ROOT密码"
+              passwd
+              sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config;
+              sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config;
+              rm -rf /etc/ssh/sshd_config.d/* /etc/ssh/ssh_config.d/*
+              restart_ssh
+              echo -e "${lv}ROOT登录设置完毕！${bai}"
+              server_reboot
+              ;;
+
+        c)
+           while true; do
+            clear
+            echo "▶ 甲骨文工具"
+            echo "------------------------"
+            echo "1. 安装活跃脚本"
+            echo "2. 卸载活跃脚本"
+            echo "------------------------"
+            echo "e. 返回主菜单"
+            echo "------------------------"
+            read -p "请输入你的选择: " sub_choice
+
+            case $sub_choice in
+                1)
+                    clear
+                    echo "活跃脚本: CPU占用10-20% 内存占用15% "
+                    read -p "确定安装吗？(Y/N): " choice
+                    case "$choice" in
+                      [Yy])
+
+                        install_docker
+
+                        docker run -itd --name=lookbusy --restart=always \
+                                -e TZ=Asia/Shanghai \
+                                -e CPU_UTIL=10-20 \
+                                -e CPU_CORE=1 \
+                                -e MEM_UTIL=15 \
+                                -e SPEEDTEST_INTERVAL=120 \
+                                fogforest/lookbusy
+                        ;;
+                      [Nn])
+                        ;;
+                      *)
+                        echo "无效的选择，请输入 Y 或 N。"
+                        ;;
+                    esac
+                    ;;
+                2)
+                    clear
+                    docker rm -f lookbusy
+                    docker rmi fogforest/lookbusy
+                    ;;
+            esac
+            break_end
+
+          done
+          ;;
+              
+          e)
+              rts
+              ;;
+          *)
+              echo "无效的输入!"
+              ;;
+
           r)
               clear
               server_reboot
@@ -1815,6 +1809,60 @@ case $choice in
 
     done
     ;;
+
+  a)
+      echo "新机系统设置"
+      echo "------------------------------------------------"
+      echo "以下内容将进行设置与调整"
+      echo "1. 更新系统"
+      echo "2. 清理系统"
+      echo -e "3. 设置时区到${huang}上海${bai}"
+      echo -e "4. 开放所有IPV4端口"
+      echo -e "5. 开启${huang}BBR${bai}加速"
+      echo "------------------------------------------------"
+      read -p "确定进行设置与调整吗？(Y/N): " choice
+
+      case "$choice" in
+      [Yy])
+      clear
+
+      echo "------------------------------------------------"
+      linux_update
+      echo -e "[${lv}OK${bai}] 1/5. 更新系统到最新"
+
+      echo "------------------------------------------------"
+      linux_clean
+      echo -e "[${lv}OK${bai}] 2/5. 清理系统垃圾文件"
+
+      echo "------------------------------------------------"
+      timedatectl set-timezone Asia/Shanghai
+      echo -e "[${lv}OK${bai}] 3/5. 设置时区到${huang}上海${bai}"
+
+      echo "------------------------------------------------"
+      iptables_open
+      remove iptables-persistent ufw firewalld iptables-services > /dev/null 2>&1
+      echo -e "[${lv}OK${bai}] 4/5. 开放所有IPV4端口"
+
+      echo "------------------------------------------------"
+      cat > /etc/sysctl.conf << EOF
+      net.core.default_qdisc=fq_pie
+      net.ipv4.tcp_congestion_control=bbr
+      EOF
+      sysctl -p
+      echo -e "[${lv}OK${bai}] 5/5. 开启${huang}BBR${bai}加速"
+
+      echo "------------------------------------------------"
+      echo -e "${lv}系统设置与调整已完成${bai}"
+
+       ;;
+      [Nn])
+      echo "已取消"
+       ;;
+      *)
+      echo "无效的选择，请输入 Y 或 N。"
+       ;;
+       esac
+       ;;    
 
   e)
     clear
