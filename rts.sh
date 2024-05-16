@@ -462,9 +462,9 @@ echo "a. 新机设置 ▶"
 echo "1. 系统信息"
 echo "2. 系统更新"
 echo "3. 系统清理"
-echo "4. 测试工具 ▶"
-echo "5. 常用工具 ▶"
-echo "6. 系统工具 ▶"
+echo "4. 系统工具 ▶"
+echo "5. 测试工具 ▶"
+echo "6. 常用工具 ▶"
 echo "7. 面板工具 ▶"
 echo "8. Docker管理 ▶"
 echo "------------------------"
@@ -474,6 +474,55 @@ echo "------------------------"
 read -p "请输入你的选择: " choice
 
 case $choice in
+  a)
+      echo "新机系统设置"
+      echo "------------------------------------------------"
+      echo "以下内容将进行设置与调整"
+      echo "1. 更新系统"
+      echo "2. 清理系统"
+      echo -e "3. 设置时区到${huang}上海${bai}"
+      echo -e "4. 开放所有IPV4端口"
+      echo -e "5. 开启${huang}BBR${bai}加速"
+      echo "------------------------------------------------"
+      read -p "确定进行设置与调整吗？(Y/N): " choice
+
+      case "$choice" in
+      [Yy])
+      clear
+
+      echo "------------------------------------------------"
+      linux_update
+      echo -e "[${lv}OK${bai}] 1/5. 更新系统到最新"
+
+      echo "------------------------------------------------"
+      linux_clean
+      echo -e "[${lv}OK${bai}] 2/5. 清理系统垃圾文件"
+
+      echo "------------------------------------------------"
+      timedatectl set-timezone Asia/Shanghai
+      echo -e "[${lv}OK${bai}] 3/5. 设置时区到${huang}上海${bai}"
+
+      echo "------------------------------------------------"
+      iptables_open
+      remove iptables-persistent ufw firewalld iptables-services > /dev/null 2>&1
+      echo -e "[${lv}OK${bai}] 4/5. 开放所有IPV4端口"
+
+      echo "------------------------------------------------"
+      bbr_on
+      echo -e "[${lv}OK${bai}] 5/5. 开启${huang}BBR${bai}加速"
+
+      echo "------------------------------------------------"
+      echo -e "${lv}系统设置与调整已完成${bai}"
+       ;;
+      [Nn])
+      echo "已取消"
+       ;;
+      *)
+      echo "无效的选择，请输入 Y 或 N。"
+       ;;
+       esac
+       ;;  
+       
   1)
     clear
     # 函数: 获取IPv4和IPv6地址
@@ -590,6 +639,500 @@ case $choice in
     ;;
 
   4)
+    while true; do
+      clear
+      echo "▶ 系统工具"
+      echo "------------------------"
+      echo "1. 系统时区调整"
+      echo "2. 开放IPV4端口"
+      echo "3. ROOT密码登录"
+      echo "4. 限流自动关机"
+      echo "5. DD重装系统"      
+      echo "6. 一键重装系统"
+      echo "7. 修改主机名"     
+      echo "8. 用户管理"            
+      echo "9. 定时任务管理"      
+      echo "a. 更改脚本快捷键"
+      echo "b. 查看端口状态"
+      echo "c. 甲骨文工具"      
+      echo "------------------------"      
+      echo "r. 重启服务器"
+      echo "------------------------"
+      echo "e. 返回主菜单"
+      echo "------------------------"
+      read -p "请输入你的选择: " sub_choice
+
+      case $sub_choice in
+          a)
+              clear
+              read -p "请输入你的快捷按键: " kuaijiejian
+              echo "alias $kuaijiejian='~/rts.sh'" >> ~/.bashrc
+              source ~/.bashrc
+              echo "快捷键已设置"
+              ;;             
+          b)
+            clear
+            ss -tulnape
+            ;;
+          2)
+              clear
+              iptables_open
+              echo "IPV4端口已开放"
+              ;;
+          1)
+            while true; do
+                clear
+                echo "系统时间信息"
+
+                # 获取当前系统时区
+                current_timezone=$(timedatectl show --property=Timezone --value)
+
+                # 获取当前系统时间
+                current_time=$(date +"%Y-%m-%d %H:%M:%S")
+
+                # 显示时区和时间
+                echo "当前系统时区：$current_timezone"
+                echo "当前系统时间：$current_time"
+
+                echo ""
+                echo "时区切换"
+                echo "亚洲------------------------"
+                echo "1. 中国上海时间              2. 中国香港时间"
+                echo "3. 日本东京时间              4. 韩国首尔时间"
+                echo "5. 新加坡时间                6. 印度加尔各答时间"
+                echo "7. 阿联酋迪拜时间            8. 澳大利亚悉尼时间"
+                echo "欧洲------------------------"
+                echo "11. 英国伦敦时间             12. 法国巴黎时间"
+                echo "13. 德国柏林时间             14. 俄罗斯莫斯科时间"
+                echo "15. 荷兰尤特赖赫特时间        16. 西班牙马德里时间"
+                echo "美洲------------------------"
+                echo "21. 美国西部时间              22. 美国东部时间"
+                echo "23. 加拿大时间               24. 墨西哥时间"
+                echo "25. 巴西时间                 26. 阿根廷时间"
+                echo "------------------------"
+                echo "e. 返回上一级选单"
+                echo "------------------------"
+                read -p "请输入你的选择: " sub_choice
+
+                case $sub_choice in
+                    1) timedatectl set-timezone Asia/Shanghai ;;
+                    2) timedatectl set-timezone Asia/Hong_Kong ;;
+                    3) timedatectl set-timezone Asia/Tokyo ;;
+                    4) timedatectl set-timezone Asia/Seoul ;;
+                    5) timedatectl set-timezone Asia/Singapore ;;
+                    6) timedatectl set-timezone Asia/Kolkata ;;
+                    7) timedatectl set-timezone Asia/Dubai ;;
+                    8) timedatectl set-timezone Australia/Sydney ;;
+                    11) timedatectl set-timezone Europe/London ;;
+                    12) timedatectl set-timezone Europe/Paris ;;
+                    13) timedatectl set-timezone Europe/Berlin ;;
+                    14) timedatectl set-timezone Europe/Moscow ;;
+                    15) timedatectl set-timezone Europe/Amsterdam ;;
+                    16) timedatectl set-timezone Europe/Madrid ;;
+                    21) timedatectl set-timezone America/Los_Angeles ;;
+                    22) timedatectl set-timezone America/New_York ;;
+                    23) timedatectl set-timezone America/Vancouver ;;
+                    24) timedatectl set-timezone America/Mexico_City ;;
+                    25) timedatectl set-timezone America/Sao_Paulo ;;
+                    26) timedatectl set-timezone America/Argentina/Buenos_Aires ;;
+                    e) break ;; # 跳出循环，退出菜单
+                    *) break ;; # 跳出循环，退出菜单
+                esac
+            done
+              ;;
+          4)
+            clear
+            echo "当前流量使用情况，重启服务器流量计算会清零！"
+            output_status
+            echo "$output"
+
+            # 检查是否存在 Internet_Limit.sh 文件
+            if [ -f ~/Internet_Limit.sh ]; then
+                # 获取 threshold_gb 的值
+                threshold_gb=$(grep -oP 'threshold_gb=\K\d+' ~/Internet_Limit.sh)
+                echo -e "当前设置的限流阈值为 ${hang}${threshold_gb}${bai}GB"
+            else
+                echo -e "${hui}前未启用限流关机功能${bai}"
+            fi
+
+            echo
+            echo "------------------------------------------------"
+            echo "系统每分钟检测实际流量是否到达阈值，到达后会自动关闭服务器！每月1日重置流量重启服务器。"
+            read -p "1. 开启限流关机功能    2. 停用限流关机功能    e. 退出  : " Limit
+
+            case "$Limit" in
+              1)
+                # 输入新的虚拟内存大小
+                echo "如果实际服务器就100G流量，可设置阈值为95G，提前关机，以免出现流量误差或溢出."
+                read -p "请输入流量阈值（单位为GB）: " threshold_gb
+                cd ~
+                curl -Ss -O https://raw.githubusercontent.com/rts600/vps/main/Internet_Limit.sh
+                chmod +x ~/Internet_Limit.sh
+                sed -i "s/110/$threshold_gb/g" ~/Internet_Limit.sh
+                crontab -l | grep -v '~/Internet_Limit.sh' | crontab -
+                (crontab -l ; echo "* * * * * ~/Internet_Limit.sh") | crontab - > /dev/null 2>&1
+                crontab -l | grep -v 'reboot' | crontab -
+                (crontab -l ; echo "0 1 1 * * reboot") | crontab - > /dev/null 2>&1
+                echo "限流关机已设置"
+                ;;
+              e)
+                echo "已取消"
+                ;;
+              2)
+                crontab -l | grep -v '~/Internet_Limit.sh' | crontab -
+                crontab -l | grep -v 'reboot' | crontab -
+                rm ~/Internet_Limit.sh
+                echo "已关闭限流关机功能"
+                ;;
+              *)
+                echo "无效的选择，请输入 Y 或 N。"
+                ;;
+            esac
+              ;;
+
+          8)
+              while true; do
+                clear
+                install sudo
+                clear
+                # 显示所有用户、用户权限、用户组和是否在sudoers中
+                echo "用户列表"
+                echo "----------------------------------------------------------------------------"
+                printf "%-24s %-34s %-20s %-10s\n" "用户名" "用户权限" "用户组" "sudo权限"
+                while IFS=: read -r username _ userid groupid _ _ homedir shell; do
+                    groups=$(groups "$username" | cut -d : -f 2)
+                    sudo_status=$(sudo -n -lU "$username" 2>/dev/null | grep -q '(ALL : ALL)' && echo "Yes" || echo "No")
+                    printf "%-20s %-30s %-20s %-10s\n" "$username" "$homedir" "$groups" "$sudo_status"
+                done < /etc/passwd
+
+                  echo ""
+                  echo "账户操作"
+                  echo "------------------------"
+                  echo "1. 创建普通账户             2. 创建高级账户"
+                  echo "------------------------"
+                  echo "3. 赋予最高权限             4. 取消最高权限"
+                  echo "------------------------"
+                  echo "5. 删除账号"
+                  echo "------------------------"
+                  echo "e. 返回上一级选单"
+                  echo "------------------------"
+                  read -p "请输入你的选择: " sub_choice
+
+                  case $sub_choice in
+                      1)
+                       # 提示用户输入新用户名
+                       read -p "请输入新用户名: " new_username
+
+                       # 创建新用户并设置密码
+                       sudo useradd -m -s /bin/bash "$new_username"
+                       sudo passwd "$new_username"
+
+                       echo "操作已完成。"
+                          ;;
+                      2)
+                       # 提示用户输入新用户名
+                       read -p "请输入新用户名: " new_username
+
+                       # 创建新用户并设置密码
+                       sudo useradd -m -s /bin/bash "$new_username"
+                       sudo passwd "$new_username"
+
+                       # 赋予新用户sudo权限
+                       echo "$new_username ALL=(ALL:ALL) ALL" | sudo tee -a /etc/sudoers
+
+                       echo "操作已完成。"
+                          ;;
+                      3)
+                       read -p "请输入用户名: " username
+                       # 赋予新用户sudo权限
+                       echo "$username ALL=(ALL:ALL) ALL" | sudo tee -a /etc/sudoers
+                          ;;
+                      4)
+                       read -p "请输入用户名: " username
+                       # 从sudoers文件中移除用户的sudo权限
+                       sudo sed -i "/^$username\sALL=(ALL:ALL)\sALL/d" /etc/sudoers
+                          ;;
+                      5)
+                       read -p "请输入要删除的用户名: " username
+                       # 删除用户及其主目录
+                       sudo userdel -r "$username"
+                          ;;
+                      e)
+                          break  # 跳出循环，退出菜单
+                          ;;
+                      *)
+                          break  # 跳出循环，退出菜单
+                          ;;
+                  esac
+              done
+              ;;
+          5)
+          clear
+          echo "请备份数据，将为你重装系统，预计花费15分钟。"
+          read -p "确定继续吗？(Y/N): " choice
+
+          case "$choice" in
+            [Yy])
+              while true; do
+                read -p "请选择要重装的系统:  1. Debian12 | 2. Ubuntu20.04 : " sys_choice
+
+                case "$sys_choice" in
+                  1)
+                    xitong="-d 12"
+                    break  # 结束循环
+                    ;;
+                  2)
+                    xitong="-u 20.04"
+                    break  # 结束循环
+                    ;;
+                  *)
+                    echo "无效的选择，请重新输入。"
+                    ;;
+                esac
+              done
+
+              read -p "请输入你重装后的密码: " vpspasswd
+              install wget
+              bash <(wget --no-check-certificate -qO- 'https://raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh') $xitong -v 64 -p $vpspasswd -port 22
+              ;;
+            [Nn])
+              echo "已取消"
+              ;;
+            *)
+              echo "无效的选择，请输入 Y 或 N。"
+              ;;
+          esac
+              ;;
+
+          6)
+          dd_xitong_2() {
+            echo -e "任意键继续，重装后初始用户名: ${huang}root${bai}  初始密码: ${huang}LeitboGi0ro${bai}  初始端口: ${huang}22${bai}"
+            read -n 1 -s -r -p ""
+            install wget
+            wget --no-check-certificate -qO InstallNET.sh 'https://raw.githubusercontent.com/leitbogioro/Tools/master/Linux_reinstall/InstallNET.sh' && chmod a+x InstallNET.sh
+          }
+
+          dd_xitong_3() {
+            echo -e "任意键继续，重装后初始用户名: ${huang}Administrator${bai}  初始密码: ${huang}Teddysun.com${bai}  初始端口: ${huang}3389${bai}"
+            read -n 1 -s -r -p ""
+            install wget
+            wget --no-check-certificate -qO InstallNET.sh 'https://raw.githubusercontent.com/leitbogioro/Tools/master/Linux_reinstall/InstallNET.sh' && chmod a+x InstallNET.sh
+          }
+
+          clear
+          echo "请备份数据，将为你重装系统，预计花费15分钟。"
+          read -p "确定继续吗？(Y/N): " choice
+
+          case "$choice" in
+            [Yy])
+              while true; do
+
+                echo "------------------------"
+                echo "1. Debian 12"
+                echo "------------------------"
+                echo "2. Ubuntu 24.04"
+                echo "3. Ubuntu 22.04"
+                echo "------------------------"
+                read -p "请选择要重装的系统: " sys_choice
+
+                case "$sys_choice" in
+                  1)
+                    dd_xitong_2
+                    bash InstallNET.sh -debian 12
+                    reboot
+                    exit
+                    ;;
+                  2)
+                    dd_xitong_2
+                    bash InstallNET.sh -ubuntu 24.04
+                    reboot
+                    exit
+                    ;;
+                  3)
+                    dd_xitong_2
+                    bash InstallNET.sh -ubuntu 22.04
+                    reboot
+                    exit
+                    ;;
+                  *)
+                    echo "无效的选择，请重新输入。"
+                    ;;
+                esac
+              done
+              ;;
+            [Nn])
+              echo "已取消"
+              ;;
+            *)
+              echo "无效的选择，请输入 Y 或 N。"
+              ;;
+          esac
+              ;;
+
+          7)
+          clear
+          current_hostname=$(hostname)
+          echo "当前主机名: $current_hostname"
+          read -p "是否要更改主机名？(y/n): " answer
+          if [[ "${answer,,}" == "y" ]]; then
+              # 获取新的主机名
+              read -p "请输入新的主机名: " new_hostname
+              if [ -n "$new_hostname" ]; then
+                  if [ -f /etc/alpine-release ]; then
+                      # Alpine
+                      echo "$new_hostname" > /etc/hostname
+                      hostname "$new_hostname"
+                  else
+                      # 其他系统，如 Debian, Ubuntu, CentOS 等
+                      hostnamectl set-hostname "$new_hostname"
+                      sed -i "s/$current_hostname/$new_hostname/g" /etc/hostname
+                      systemctl restart systemd-hostnamed
+                  fi
+                  echo "主机名已更改为: $new_hostname"
+              else
+                  echo "无效的主机名。未更改主机名。"
+                  exit 1
+              fi
+          else
+              echo "未更改主机名。"
+          fi
+              ;;
+
+          9)
+              while true; do
+                  clear
+                  echo "定时任务列表"
+                  crontab -l
+                  echo ""
+                  echo "操作"
+                  echo "------------------------"
+                  echo "1. 添加定时任务"
+                  echo "2. 删除定时任务"                  
+                  echo "------------------------"
+                  echo "e. 返回上一级选单"
+                  echo "------------------------"
+                  read -p "请输入你的选择: " sub_choice
+
+                  case $sub_choice in
+                      1)
+                          read -p "请输入新任务的执行命令: " newquest
+                          echo "------------------------"
+                          echo "1. 每周任务                 2. 每天任务"
+                          read -p "请输入你的选择: " dingshi
+
+                          case $dingshi in
+                              1)
+                                  read -p "选择周几执行任务？ (0-6，0代表星期日): " weekday
+                                  (crontab -l ; echo "0 0 * * $weekday $newquest") | crontab - > /dev/null 2>&1
+                                  ;;
+                              2)
+                                  read -p "选择每天几点执行任务？（小时，0-23）: " hour
+                                  (crontab -l ; echo "0 $hour * * * $newquest") | crontab - > /dev/null 2>&1
+                                  ;;
+                              *)
+                                  break  # 跳出
+                                  ;;
+                          esac
+                          ;;
+                      2)
+                          read -p "请输入需要删除任务的关键字: " kquest
+                          crontab -l | grep -v "$kquest" | crontab -
+                          ;;
+                      e)
+                          break  # 跳出循环，退出菜单
+                          ;;
+                      *)
+                          break  # 跳出循环，退出菜单
+                          ;;
+                  esac
+              done
+              ;;
+
+          3)
+              clear
+              echo "设置你的ROOT密码"
+              passwd
+              sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config;
+              sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config;
+              rm -rf /etc/ssh/sshd_config.d/* /etc/ssh/ssh_config.d/*
+              restart_ssh
+              echo -e "${lv}ROOT登录设置完毕！${bai}"
+              server_reboot
+              ;;
+
+        c)
+           while true; do
+            clear
+            echo "▶ 甲骨文工具"
+            echo "------------------------"
+            echo "1. 安装活跃脚本"
+            echo "2. 卸载活跃脚本"
+            echo "------------------------"
+            echo "e. 返回主菜单"
+            echo "------------------------"
+            read -p "请输入你的选择: " sub_choice
+
+            case $sub_choice in
+                1)
+                    clear
+                    echo "活跃脚本: CPU占用10-20% 内存占用15% "
+                    read -p "确定安装吗？(Y/N): " choice
+                    case "$choice" in
+                      [Yy])
+
+                        install_docker
+
+                        docker run -itd --name=lookbusy --restart=always \
+                                -e TZ=Asia/Shanghai \
+                                -e CPU_UTIL=10-20 \
+                                -e CPU_CORE=1 \
+                                -e MEM_UTIL=15 \
+                                -e SPEEDTEST_INTERVAL=120 \
+                                fogforest/lookbusy
+                        ;;
+                      [Nn])
+                        ;;
+                      *)
+                        echo "无效的选择，请输入 Y 或 N。"
+                        ;;
+                    esac
+                    ;;
+                2)
+                    clear
+                    docker rm -f lookbusy
+                    docker rmi fogforest/lookbusy
+                    ;;
+                e)
+                    break  # 跳出循环，退出菜单
+                    ;;
+                   esac
+          done
+          ;;
+              
+          e)
+              rts
+              ;;
+          *)
+              echo "无效的输入!"
+              ;;
+
+          r)
+              clear
+              server_reboot
+              ;;
+          e)
+              rts
+              ;;
+          *)
+              echo "无效的输入!"
+              ;;
+      esac
+      break_end
+
+    done
+    ;;
+
+  5)
     while true; do
       clear
       echo "▶ 测试工具"
@@ -723,7 +1266,7 @@ case $choice in
     done
     ;;
 
-  5)
+  6)
   while true; do
       clear
       echo "▶ 安装常用工具"
@@ -1324,550 +1867,7 @@ case $choice in
       break_end
 
     done
-    ;;
-
-  6)
-    while true; do
-      clear
-      echo "▶ 系统工具"
-      echo "------------------------"
-      echo "1. 系统时区调整"
-      echo "2. 开放IPV4端口"
-      echo "3. ROOT密码登录"
-      echo "4. 限流自动关机"
-      echo "5. DD重装系统"      
-      echo "6. 一键重装系统"
-      echo "7. 修改主机名"     
-      echo "8. 用户管理"            
-      echo "9. 定时任务管理"      
-      echo "a. 更改脚本快捷键"
-      echo "b. 查看端口状态"
-      echo "c. 甲骨文工具"      
-      echo "------------------------"      
-      echo "r. 重启服务器"
-      echo "------------------------"
-      echo "e. 返回主菜单"
-      echo "------------------------"
-      read -p "请输入你的选择: " sub_choice
-
-      case $sub_choice in
-          a)
-              clear
-              read -p "请输入你的快捷按键: " kuaijiejian
-              echo "alias $kuaijiejian='~/rts.sh'" >> ~/.bashrc
-              source ~/.bashrc
-              echo "快捷键已设置"
-              ;;             
-          b)
-            clear
-            ss -tulnape
-            ;;
-          2)
-              clear
-              iptables_open
-              echo "IPV4端口已开放"
-              ;;
-          1)
-            while true; do
-                clear
-                echo "系统时间信息"
-
-                # 获取当前系统时区
-                current_timezone=$(timedatectl show --property=Timezone --value)
-
-                # 获取当前系统时间
-                current_time=$(date +"%Y-%m-%d %H:%M:%S")
-
-                # 显示时区和时间
-                echo "当前系统时区：$current_timezone"
-                echo "当前系统时间：$current_time"
-
-                echo ""
-                echo "时区切换"
-                echo "亚洲------------------------"
-                echo "1. 中国上海时间              2. 中国香港时间"
-                echo "3. 日本东京时间              4. 韩国首尔时间"
-                echo "5. 新加坡时间                6. 印度加尔各答时间"
-                echo "7. 阿联酋迪拜时间            8. 澳大利亚悉尼时间"
-                echo "欧洲------------------------"
-                echo "11. 英国伦敦时间             12. 法国巴黎时间"
-                echo "13. 德国柏林时间             14. 俄罗斯莫斯科时间"
-                echo "15. 荷兰尤特赖赫特时间        16. 西班牙马德里时间"
-                echo "美洲------------------------"
-                echo "21. 美国西部时间              22. 美国东部时间"
-                echo "23. 加拿大时间               24. 墨西哥时间"
-                echo "25. 巴西时间                 26. 阿根廷时间"
-                echo "------------------------"
-                echo "e. 返回上一级选单"
-                echo "------------------------"
-                read -p "请输入你的选择: " sub_choice
-
-                case $sub_choice in
-                    1) timedatectl set-timezone Asia/Shanghai ;;
-                    2) timedatectl set-timezone Asia/Hong_Kong ;;
-                    3) timedatectl set-timezone Asia/Tokyo ;;
-                    4) timedatectl set-timezone Asia/Seoul ;;
-                    5) timedatectl set-timezone Asia/Singapore ;;
-                    6) timedatectl set-timezone Asia/Kolkata ;;
-                    7) timedatectl set-timezone Asia/Dubai ;;
-                    8) timedatectl set-timezone Australia/Sydney ;;
-                    11) timedatectl set-timezone Europe/London ;;
-                    12) timedatectl set-timezone Europe/Paris ;;
-                    13) timedatectl set-timezone Europe/Berlin ;;
-                    14) timedatectl set-timezone Europe/Moscow ;;
-                    15) timedatectl set-timezone Europe/Amsterdam ;;
-                    16) timedatectl set-timezone Europe/Madrid ;;
-                    21) timedatectl set-timezone America/Los_Angeles ;;
-                    22) timedatectl set-timezone America/New_York ;;
-                    23) timedatectl set-timezone America/Vancouver ;;
-                    24) timedatectl set-timezone America/Mexico_City ;;
-                    25) timedatectl set-timezone America/Sao_Paulo ;;
-                    26) timedatectl set-timezone America/Argentina/Buenos_Aires ;;
-                    e) break ;; # 跳出循环，退出菜单
-                    *) break ;; # 跳出循环，退出菜单
-                esac
-            done
-              ;;
-          4)
-            clear
-            echo "当前流量使用情况，重启服务器流量计算会清零！"
-            output_status
-            echo "$output"
-
-            # 检查是否存在 Internet_Limit.sh 文件
-            if [ -f ~/Internet_Limit.sh ]; then
-                # 获取 threshold_gb 的值
-                threshold_gb=$(grep -oP 'threshold_gb=\K\d+' ~/Internet_Limit.sh)
-                echo -e "当前设置的限流阈值为 ${hang}${threshold_gb}${bai}GB"
-            else
-                echo -e "${hui}前未启用限流关机功能${bai}"
-            fi
-
-            echo
-            echo "------------------------------------------------"
-            echo "系统每分钟检测实际流量是否到达阈值，到达后会自动关闭服务器！每月1日重置流量重启服务器。"
-            read -p "1. 开启限流关机功能    2. 停用限流关机功能    e. 退出  : " Limit
-
-            case "$Limit" in
-              1)
-                # 输入新的虚拟内存大小
-                echo "如果实际服务器就100G流量，可设置阈值为95G，提前关机，以免出现流量误差或溢出."
-                read -p "请输入流量阈值（单位为GB）: " threshold_gb
-                cd ~
-                curl -Ss -O https://raw.githubusercontent.com/rts600/vps/main/Internet_Limit.sh
-                chmod +x ~/Internet_Limit.sh
-                sed -i "s/110/$threshold_gb/g" ~/Internet_Limit.sh
-                crontab -l | grep -v '~/Internet_Limit.sh' | crontab -
-                (crontab -l ; echo "* * * * * ~/Internet_Limit.sh") | crontab - > /dev/null 2>&1
-                crontab -l | grep -v 'reboot' | crontab -
-                (crontab -l ; echo "0 1 1 * * reboot") | crontab - > /dev/null 2>&1
-                echo "限流关机已设置"
-                ;;
-              e)
-                echo "已取消"
-                ;;
-              2)
-                crontab -l | grep -v '~/Internet_Limit.sh' | crontab -
-                crontab -l | grep -v 'reboot' | crontab -
-                rm ~/Internet_Limit.sh
-                echo "已关闭限流关机功能"
-                ;;
-              *)
-                echo "无效的选择，请输入 Y 或 N。"
-                ;;
-            esac
-              ;;
-
-          8)
-              while true; do
-                clear
-                install sudo
-                clear
-                # 显示所有用户、用户权限、用户组和是否在sudoers中
-                echo "用户列表"
-                echo "----------------------------------------------------------------------------"
-                printf "%-24s %-34s %-20s %-10s\n" "用户名" "用户权限" "用户组" "sudo权限"
-                while IFS=: read -r username _ userid groupid _ _ homedir shell; do
-                    groups=$(groups "$username" | cut -d : -f 2)
-                    sudo_status=$(sudo -n -lU "$username" 2>/dev/null | grep -q '(ALL : ALL)' && echo "Yes" || echo "No")
-                    printf "%-20s %-30s %-20s %-10s\n" "$username" "$homedir" "$groups" "$sudo_status"
-                done < /etc/passwd
-
-                  echo ""
-                  echo "账户操作"
-                  echo "------------------------"
-                  echo "1. 创建普通账户             2. 创建高级账户"
-                  echo "------------------------"
-                  echo "3. 赋予最高权限             4. 取消最高权限"
-                  echo "------------------------"
-                  echo "5. 删除账号"
-                  echo "------------------------"
-                  echo "e. 返回上一级选单"
-                  echo "------------------------"
-                  read -p "请输入你的选择: " sub_choice
-
-                  case $sub_choice in
-                      1)
-                       # 提示用户输入新用户名
-                       read -p "请输入新用户名: " new_username
-
-                       # 创建新用户并设置密码
-                       sudo useradd -m -s /bin/bash "$new_username"
-                       sudo passwd "$new_username"
-
-                       echo "操作已完成。"
-                          ;;
-                      2)
-                       # 提示用户输入新用户名
-                       read -p "请输入新用户名: " new_username
-
-                       # 创建新用户并设置密码
-                       sudo useradd -m -s /bin/bash "$new_username"
-                       sudo passwd "$new_username"
-
-                       # 赋予新用户sudo权限
-                       echo "$new_username ALL=(ALL:ALL) ALL" | sudo tee -a /etc/sudoers
-
-                       echo "操作已完成。"
-                          ;;
-                      3)
-                       read -p "请输入用户名: " username
-                       # 赋予新用户sudo权限
-                       echo "$username ALL=(ALL:ALL) ALL" | sudo tee -a /etc/sudoers
-                          ;;
-                      4)
-                       read -p "请输入用户名: " username
-                       # 从sudoers文件中移除用户的sudo权限
-                       sudo sed -i "/^$username\sALL=(ALL:ALL)\sALL/d" /etc/sudoers
-                          ;;
-                      5)
-                       read -p "请输入要删除的用户名: " username
-                       # 删除用户及其主目录
-                       sudo userdel -r "$username"
-                          ;;
-                      e)
-                          break  # 跳出循环，退出菜单
-                          ;;
-                      *)
-                          break  # 跳出循环，退出菜单
-                          ;;
-                  esac
-              done
-              ;;
-          5)
-          clear
-          echo "请备份数据，将为你重装系统，预计花费15分钟。"
-          read -p "确定继续吗？(Y/N): " choice
-
-          case "$choice" in
-            [Yy])
-              while true; do
-                read -p "请选择要重装的系统:  1. Debian12 | 2. Ubuntu20.04 : " sys_choice
-
-                case "$sys_choice" in
-                  1)
-                    xitong="-d 12"
-                    break  # 结束循环
-                    ;;
-                  2)
-                    xitong="-u 20.04"
-                    break  # 结束循环
-                    ;;
-                  *)
-                    echo "无效的选择，请重新输入。"
-                    ;;
-                esac
-              done
-
-              read -p "请输入你重装后的密码: " vpspasswd
-              install wget
-              bash <(wget --no-check-certificate -qO- 'https://raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh') $xitong -v 64 -p $vpspasswd -port 22
-              ;;
-            [Nn])
-              echo "已取消"
-              ;;
-            *)
-              echo "无效的选择，请输入 Y 或 N。"
-              ;;
-          esac
-              ;;
-
-          6)
-          dd_xitong_2() {
-            echo -e "任意键继续，重装后初始用户名: ${huang}root${bai}  初始密码: ${huang}LeitboGi0ro${bai}  初始端口: ${huang}22${bai}"
-            read -n 1 -s -r -p ""
-            install wget
-            wget --no-check-certificate -qO InstallNET.sh 'https://raw.githubusercontent.com/leitbogioro/Tools/master/Linux_reinstall/InstallNET.sh' && chmod a+x InstallNET.sh
-          }
-
-          dd_xitong_3() {
-            echo -e "任意键继续，重装后初始用户名: ${huang}Administrator${bai}  初始密码: ${huang}Teddysun.com${bai}  初始端口: ${huang}3389${bai}"
-            read -n 1 -s -r -p ""
-            install wget
-            wget --no-check-certificate -qO InstallNET.sh 'https://raw.githubusercontent.com/leitbogioro/Tools/master/Linux_reinstall/InstallNET.sh' && chmod a+x InstallNET.sh
-          }
-
-          clear
-          echo "请备份数据，将为你重装系统，预计花费15分钟。"
-          read -p "确定继续吗？(Y/N): " choice
-
-          case "$choice" in
-            [Yy])
-              while true; do
-
-                echo "------------------------"
-                echo "1. Debian 12"
-                echo "------------------------"
-                echo "2. Ubuntu 24.04"
-                echo "3. Ubuntu 22.04"
-                echo "------------------------"
-                read -p "请选择要重装的系统: " sys_choice
-
-                case "$sys_choice" in
-                  1)
-                    dd_xitong_2
-                    bash InstallNET.sh -debian 12
-                    reboot
-                    exit
-                    ;;
-                  2)
-                    dd_xitong_2
-                    bash InstallNET.sh -ubuntu 24.04
-                    reboot
-                    exit
-                    ;;
-                  3)
-                    dd_xitong_2
-                    bash InstallNET.sh -ubuntu 22.04
-                    reboot
-                    exit
-                    ;;
-                  *)
-                    echo "无效的选择，请重新输入。"
-                    ;;
-                esac
-              done
-              ;;
-            [Nn])
-              echo "已取消"
-              ;;
-            *)
-              echo "无效的选择，请输入 Y 或 N。"
-              ;;
-          esac
-              ;;
-
-          7)
-          clear
-          current_hostname=$(hostname)
-          echo "当前主机名: $current_hostname"
-          read -p "是否要更改主机名？(y/n): " answer
-          if [[ "${answer,,}" == "y" ]]; then
-              # 获取新的主机名
-              read -p "请输入新的主机名: " new_hostname
-              if [ -n "$new_hostname" ]; then
-                  if [ -f /etc/alpine-release ]; then
-                      # Alpine
-                      echo "$new_hostname" > /etc/hostname
-                      hostname "$new_hostname"
-                  else
-                      # 其他系统，如 Debian, Ubuntu, CentOS 等
-                      hostnamectl set-hostname "$new_hostname"
-                      sed -i "s/$current_hostname/$new_hostname/g" /etc/hostname
-                      systemctl restart systemd-hostnamed
-                  fi
-                  echo "主机名已更改为: $new_hostname"
-              else
-                  echo "无效的主机名。未更改主机名。"
-                  exit 1
-              fi
-          else
-              echo "未更改主机名。"
-          fi
-              ;;
-
-          9)
-              while true; do
-                  clear
-                  echo "定时任务列表"
-                  crontab -l
-                  echo ""
-                  echo "操作"
-                  echo "------------------------"
-                  echo "1. 添加定时任务"
-                  echo "2. 删除定时任务"                  
-                  echo "------------------------"
-                  echo "e. 返回上一级选单"
-                  echo "------------------------"
-                  read -p "请输入你的选择: " sub_choice
-
-                  case $sub_choice in
-                      1)
-                          read -p "请输入新任务的执行命令: " newquest
-                          echo "------------------------"
-                          echo "1. 每周任务                 2. 每天任务"
-                          read -p "请输入你的选择: " dingshi
-
-                          case $dingshi in
-                              1)
-                                  read -p "选择周几执行任务？ (0-6，0代表星期日): " weekday
-                                  (crontab -l ; echo "0 0 * * $weekday $newquest") | crontab - > /dev/null 2>&1
-                                  ;;
-                              2)
-                                  read -p "选择每天几点执行任务？（小时，0-23）: " hour
-                                  (crontab -l ; echo "0 $hour * * * $newquest") | crontab - > /dev/null 2>&1
-                                  ;;
-                              *)
-                                  break  # 跳出
-                                  ;;
-                          esac
-                          ;;
-                      2)
-                          read -p "请输入需要删除任务的关键字: " kquest
-                          crontab -l | grep -v "$kquest" | crontab -
-                          ;;
-                      e)
-                          break  # 跳出循环，退出菜单
-                          ;;
-                      *)
-                          break  # 跳出循环，退出菜单
-                          ;;
-                  esac
-              done
-              ;;
-
-          3)
-              clear
-              echo "设置你的ROOT密码"
-              passwd
-              sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config;
-              sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config;
-              rm -rf /etc/ssh/sshd_config.d/* /etc/ssh/ssh_config.d/*
-              restart_ssh
-              echo -e "${lv}ROOT登录设置完毕！${bai}"
-              server_reboot
-              ;;
-
-        c)
-           while true; do
-            clear
-            echo "▶ 甲骨文工具"
-            echo "------------------------"
-            echo "1. 安装活跃脚本"
-            echo "2. 卸载活跃脚本"
-            echo "------------------------"
-            echo "e. 返回主菜单"
-            echo "------------------------"
-            read -p "请输入你的选择: " sub_choice
-
-            case $sub_choice in
-                1)
-                    clear
-                    echo "活跃脚本: CPU占用10-20% 内存占用15% "
-                    read -p "确定安装吗？(Y/N): " choice
-                    case "$choice" in
-                      [Yy])
-
-                        install_docker
-
-                        docker run -itd --name=lookbusy --restart=always \
-                                -e TZ=Asia/Shanghai \
-                                -e CPU_UTIL=10-20 \
-                                -e CPU_CORE=1 \
-                                -e MEM_UTIL=15 \
-                                -e SPEEDTEST_INTERVAL=120 \
-                                fogforest/lookbusy
-                        ;;
-                      [Nn])
-                        ;;
-                      *)
-                        echo "无效的选择，请输入 Y 或 N。"
-                        ;;
-                    esac
-                    ;;
-                2)
-                    clear
-                    docker rm -f lookbusy
-                    docker rmi fogforest/lookbusy
-                    ;;
-                e)
-                    break  # 跳出循环，退出菜单
-                    ;;
-                   esac
-          done
-          ;;
-              
-          e)
-              rts
-              ;;
-          *)
-              echo "无效的输入!"
-              ;;
-
-          r)
-              clear
-              server_reboot
-              ;;
-          e)
-              rts
-              ;;
-          *)
-              echo "无效的输入!"
-              ;;
-      esac
-      break_end
-
-    done
-    ;;
-
-  a)
-      echo "新机系统设置"
-      echo "------------------------------------------------"
-      echo "以下内容将进行设置与调整"
-      echo "1. 更新系统"
-      echo "2. 清理系统"
-      echo -e "3. 设置时区到${huang}上海${bai}"
-      echo -e "4. 开放所有IPV4端口"
-      echo -e "5. 开启${huang}BBR${bai}加速"
-      echo "------------------------------------------------"
-      read -p "确定进行设置与调整吗？(Y/N): " choice
-
-      case "$choice" in
-      [Yy])
-      clear
-
-      echo "------------------------------------------------"
-      linux_update
-      echo -e "[${lv}OK${bai}] 1/5. 更新系统到最新"
-
-      echo "------------------------------------------------"
-      linux_clean
-      echo -e "[${lv}OK${bai}] 2/5. 清理系统垃圾文件"
-
-      echo "------------------------------------------------"
-      timedatectl set-timezone Asia/Shanghai
-      echo -e "[${lv}OK${bai}] 3/5. 设置时区到${huang}上海${bai}"
-
-      echo "------------------------------------------------"
-      iptables_open
-      remove iptables-persistent ufw firewalld iptables-services > /dev/null 2>&1
-      echo -e "[${lv}OK${bai}] 4/5. 开放所有IPV4端口"
-
-      echo "------------------------------------------------"
-      bbr_on
-      echo -e "[${lv}OK${bai}] 5/5. 开启${huang}BBR${bai}加速"
-
-      echo "------------------------------------------------"
-      echo -e "${lv}系统设置与调整已完成${bai}"
-       ;;
-      [Nn])
-      echo "已取消"
-       ;;
-      *)
-      echo "无效的选择，请输入 Y 或 N。"
-       ;;
-       esac
-       ;;    
+    ;;  
 
   e)
     clear
