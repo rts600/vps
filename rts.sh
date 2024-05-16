@@ -1790,9 +1790,10 @@ case $choice in
                     docker rm -f lookbusy
                     docker rmi fogforest/lookbusy
                     ;;
-            esac
-            break_end
-
+                *)
+                    break  # 跳出循环，退出菜单
+                    ;;
+                   esac
           done
           ;;
               
