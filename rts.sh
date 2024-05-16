@@ -1849,6 +1849,7 @@ case $choice in
       net.ipv4.tcp_congestion_control=bbr
       EOF
       sysctl -p
+      ;;
       echo -e "[${lv}OK${bai}] 5/5. 开启${huang}BBR${bai}加速"
 
       echo "------------------------------------------------"
