@@ -185,10 +185,8 @@ linux_clean() {
 
 bbr_on() {
 
-cat > /etc/sysctl.conf << EOF
-net.core.default_qdisc=fq_pie
-net.ipv4.tcp_congestion_control=bbr
-EOF
+echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+echo "net.core.default_qdisc=fq_pie" >> /etc/sysctl.conf
 sysctl -p
 
 }
@@ -654,7 +652,7 @@ case $choice in
       echo "9. 定时任务管理"      
       echo "a. 更改脚本快捷键"
       echo "b. 查看端口状态"
-      echo "c. 甲骨文工具"      
+      echo "c. 甲骨文工具"
       echo "------------------------"      
       echo "r. 重启服务器"
       echo "------------------------"
