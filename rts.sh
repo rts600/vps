@@ -185,11 +185,9 @@ linux_clean() {
 
 bbr_on() {
 
-cat > /etc/sysctl.conf << EOF
-net.core.default_qdisc=fq_pie
-net.ipv4.tcp_congestion_control=bbr
-EOF
-sysctl -p
+echo "net.core.default_qdisc=fq_pie" >> /etc/sysctl.conf > /dev/null 2>&1
+echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf > /dev/null 2>&1
+sysctl -p > /dev/null 2>&1
 
 }
 
@@ -504,7 +502,6 @@ case $choice in
 
       echo "------------------------------------------------"
       iptables_open
-      remove iptables-persistent ufw firewalld iptables-services > /dev/null 2>&1
       echo -e "[${lv}OK${bai}] 4/5. 开放所有IPV4端口"
 
       echo "------------------------------------------------"
@@ -512,16 +509,9 @@ case $choice in
       echo -e "[${lv}OK${bai}] 5/5. 开启${huang}BBR${bai}加速"
 
       echo "------------------------------------------------"
-      echo -e "${lv}系统设置与调整已完成${bai}"
+      echo -e "${lv}系统设置已完成，重启中...${bai}"
+      reboot
        ;;
-      [Nn])
-      echo "已取消"
-       ;;
-      *)
-      echo "无效的选择，请输入 Y 或 N。"
-       ;;
-       esac
-       ;;  
        
   1)
     clear
