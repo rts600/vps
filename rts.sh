@@ -185,9 +185,9 @@ linux_clean() {
 
 bbr_on() {
 
-echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
-echo "net.core.default_qdisc=fq_pie" >> /etc/sysctl.conf
-sysctl -p
+echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf > /dev/null 2>&1
+echo "net.core.default_qdisc=fq_pie" >> /etc/sysctl.conf > /dev/null 2>&1
+sysctl -p > /dev/null 2>&1
 
 }
 
