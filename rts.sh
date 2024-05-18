@@ -191,7 +191,7 @@ sysctl -p > /dev/null 2>&1
 
 }
 
-install_fail2ban () {
+install_fail2ban() {
        sudo apt-get install fail2ban
        sleep 2
        sudo systemctl start fail2ban
