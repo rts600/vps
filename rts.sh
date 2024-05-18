@@ -185,10 +185,28 @@ linux_clean() {
 
 bbr_on() {
 
-echo "net.core.default_qdisc=fq_pie" >> /etc/sysctl.conf > /dev/null 2>&1
-echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf > /dev/null 2>&1
-sysctl -p > /dev/null 2>&1
+   echo "net.core.default_qdisc=fq_pie" >> /etc/sysctl.conf > /dev/null 2>&1
+   echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf > /dev/null 2>&1
+   sysctl -p > /dev/null 2>&1
 
+}
+
+install_fail2ban() {
+   if grep -qi 'Ubuntu' /etc/os-release; then
+       sudo apt-get install fail2ban
+       sleep 2
+       sudo systemctl start fail2ban
+       sudo systemctl enable fail2ban
+       sudo systemctl status fail2ban
+   elif grep -qi 'Debian' /etc/os-release; then
+       sudo apt-get install fail2ban
+       sleep 2
+       sudo apt-get install rsyslog
+       sleep 1
+       sudo systemctl start fail2ban
+       sudo systemctl enable fail2ban
+       sudo systemctl status fail2ban
+   fi
 }
 
 install_add_docker() {
@@ -653,7 +671,8 @@ case $choice in
       echo "9. 定时任务管理"      
       echo "a. 更改脚本快捷键"
       echo "b. 查看端口状态"
-      echo "c. 甲骨文工具"      
+      echo "c. 甲骨文工具" 
+      echo "d. 安装Fail2Ban"       
       echo "------------------------"      
       echo "r. 重启服务器"
       echo "------------------------"
@@ -672,6 +691,10 @@ case $choice in
           b)
             clear
             ss -tulnape
+            ;;
+          d)
+            clear
+            install_fail2ban
             ;;
           2)
               clear
