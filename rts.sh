@@ -191,15 +191,6 @@ sysctl -p > /dev/null 2>&1
 
 }
 
-install_fail2ban() {
-       sudo apt-get install fail2ban
-       sleep 2
-       sudo systemctl start fail2ban
-       sudo systemctl enable fail2ban
-       sudo systemctl status fail2ban
-       echo "Fail2Ban安装完成"
-}
-
 install_add_docker() {
     if [ -f "/etc/alpine-release" ]; then
         apk update
@@ -654,8 +645,7 @@ case $choice in
       echo "9. 定时任务管理"      
       echo "a. 更改脚本快捷键"
       echo "b. 查看端口状态"
-      echo "c. 甲骨文工具"
-      echo "d. 安装Fail2Ban"      
+      echo "c. 甲骨文工具"    
       echo "------------------------"      
       echo "r. 重启服务器"
       echo "------------------------"
@@ -674,10 +664,7 @@ case $choice in
           b)
             clear
             ss -tulnape
-            ;;
-          d)
-            install_fail2ban
-            ;;               
+            ;;             
           2)
               clear
               iptables_open
