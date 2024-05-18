@@ -655,6 +655,7 @@ case $choice in
       echo "a. 更改脚本快捷键"
       echo "b. 查看端口状态"
       echo "c. 甲骨文工具"
+      echo "d. 安装Fail2Ban"      
       echo "------------------------"      
       echo "r. 重启服务器"
       echo "------------------------"
@@ -674,6 +675,9 @@ case $choice in
             clear
             ss -tulnape
             ;;
+          d)
+            install_fail2ban
+            ;;               
           2)
               clear
               iptables_open
@@ -1781,10 +1785,9 @@ case $choice in
       echo "▶ 面板工具"
       echo "------------------------"
       echo "1. 1Panel管理面板"
-      echo "2. 安装Fail2Ban"
-      echo "3. NginxProxyManager面板"      
-      echo "4. LibreSpeed测速工具"
-      echo "5. Speedtest测速工具"            
+      echo "2. NginxProxyManager面板"      
+      echo "3. LibreSpeed测速工具"
+      echo "4. Speedtest测速工具"            
       echo "------------------------"
       echo "e. 返回主菜单"
       echo "------------------------"
@@ -1812,9 +1815,6 @@ case $choice in
             install_panel
               ;;             
           2)
-            install_fail2ban
-            ;;   
-          3)
             docker_name="npm"
             docker_img="jc21/nginx-proxy-manager:latest"
             docker_port=81
@@ -1833,7 +1833,7 @@ case $choice in
             docker_passwd="echo \"初始密码: changeme\""
             docker_app
               ;;
-          4)
+          3)
             docker_name="speedtest"
             docker_img="ghcr.io/librespeed/speedtest:latest"
             docker_port=6681
@@ -1849,7 +1849,7 @@ case $choice in
             docker_passwd=""
             docker_app
               ;;
-          5)
+          4)
             docker_name="looking-glass"
             docker_img="wikihostinc/looking-glass-server"
             docker_port=89
@@ -1888,3 +1888,4 @@ case $choice in
     ;;
 esac
     break_end
+done
