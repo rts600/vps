@@ -195,6 +195,9 @@ install_fail2ban () {
 echo "开始安装Fail2Ban"
 sudo apt-get install fail2ban
 sleep 2
+}
+
+start_fail2ban () {
 sudo systemctl start fail2ban
 sudo systemctl enable fail2ban
 sudo systemctl status fail2ban
@@ -1813,8 +1816,16 @@ case $choice in
             install_panel
               ;;             
           2)
+            if grep -qi 'Ubuntu' /etc/os-release; then
             install_fail2ban
-              ;;   
+            start_fail2ban
+            elif grep -qi 'Debian' /etc/os-release; then
+            install_fail2ban
+            sudo apt-get install rsyslog
+            sleep 1
+            start_fail2ban          
+            fi
+            ;;   
           3)
             docker_name="npm"
             docker_img="jc21/nginx-proxy-manager:latest"
