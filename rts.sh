@@ -221,6 +221,7 @@ iptables_open() {
     iptables -P FORWARD ACCEPT
     iptables -P OUTPUT ACCEPT
     iptables -F
+    apt-get purge netfilter-persistent
 }
 
 
@@ -502,7 +503,6 @@ case $choice in
 
       echo "------------------------------------------------"
       iptables_open
-      remove iptables-persistent ufw firewalld iptables-services > /dev/null 2>&1
       echo -e "[${lv}OK${bai}] 4/5. 开放所有IPV4端口"
 
       echo "------------------------------------------------"
@@ -511,6 +511,7 @@ case $choice in
 
       echo "------------------------------------------------"
       echo -e "${lv}系统设置与调整已完成${bai}"
+      reboot
        ;;
       [Nn])
       echo "已取消"
