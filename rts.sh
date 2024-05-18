@@ -221,6 +221,7 @@ iptables_open() {
     iptables -P FORWARD ACCEPT
     iptables -P OUTPUT ACCEPT
     iptables -F
+    rm -rf /etc/iptables    
 }
 
 
@@ -511,7 +512,8 @@ case $choice in
       echo "------------------------------------------------"
       echo -e "${lv}系统设置已完成，重启中...${bai}"
       reboot
-       ;;
+      esac
+      ;;
        
   1)
     clear
