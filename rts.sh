@@ -192,16 +192,23 @@ sysctl -p > /dev/null 2>&1
 }
 
 install_fail2ban () {
-echo "开始安装Fail2Ban"
-sudo apt-get install fail2ban
-sleep 2
-}
-
-start_fail2ban () {
-sudo systemctl start fail2ban
-sudo systemctl enable fail2ban
-sudo systemctl status fail2ban
-echo "Fail2Ban安装完成"
+    if grep -qi 'Ubuntu' /etc/os-release; then
+       sudo apt-get install fail2ban
+       sleep 2
+       sudo systemctl start fail2ban
+       sudo systemctl enable fail2ban
+       sudo systemctl status fail2ban
+       echo "Fail2Ban安装完成"
+    elif grep -qi 'Debian' /etc/os-release; then
+       sudo apt-get install fail2ban
+       sleep 2
+       sudo apt-get install rsyslog
+       sleep 1
+       sudo systemctl start fail2ban
+       sudo systemctl enable fail2ban
+       sudo systemctl status fail2ban
+       echo "Fail2Ban安装完成"         
+    fi
 }
 
 install_add_docker() {
@@ -1816,15 +1823,7 @@ case $choice in
             install_panel
               ;;             
           2)
-            if grep -qi 'Ubuntu' /etc/os-release; then
-            install_fail2ban
-            start_fail2ban
-            elif grep -qi 'Debian' /etc/os-release; then
-            install_fail2ban
-            sudo apt-get install rsyslog
-            sleep 1
-            start_fail2ban          
-            fi
+
             ;;   
           3)
             docker_name="npm"
@@ -1901,4 +1900,3 @@ case $choice in
 esac
     break_end
 done
-;;
