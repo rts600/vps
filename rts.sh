@@ -192,23 +192,12 @@ sysctl -p > /dev/null 2>&1
 }
 
 install_fail2ban () {
-    if grep -qi 'Ubuntu' /etc/os-release; then
        sudo apt-get install fail2ban
        sleep 2
        sudo systemctl start fail2ban
        sudo systemctl enable fail2ban
        sudo systemctl status fail2ban
        echo "Fail2Ban安装完成"
-    elif grep -qi 'Debian' /etc/os-release; then
-       sudo apt-get install fail2ban
-       sleep 2
-       sudo apt-get install rsyslog
-       sleep 1
-       sudo systemctl start fail2ban
-       sudo systemctl enable fail2ban
-       sudo systemctl status fail2ban
-       echo "Fail2Ban安装完成"         
-    fi
 }
 
 install_add_docker() {
