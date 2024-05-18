@@ -1823,7 +1823,7 @@ case $choice in
             install_panel
               ;;             
           2)
-
+            install_fail2ban
             ;;   
           3)
             docker_name="npm"
